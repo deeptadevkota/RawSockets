@@ -7,6 +7,11 @@
 #include <arpa/inet.h>
 #include <netinet/if_ether.h>
 
+struct new_ip
+{
+    int a;
+};
+
 int main()
 {
   // Structs that contain source IP addresses
@@ -17,7 +22,6 @@ int main()
   // Allocate string buffer to hold incoming packet data
   unsigned char *buffer = (unsigned char *)malloc(65536);
   // Open the raw socket
-
 
   int sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 
@@ -37,18 +41,20 @@ int main()
       return 1;
     }
 
-
     struct ethhdr *eth = (struct ethhdr *)(buffer);
-    printf("\nEthernet Header\n");
-    printf("\t | -Source Address : %.2X - %.2X - %.2X - %.2X - %.2X - %.2X\n", eth->h_source[0], eth->h_source[1], eth->h_source[2], eth->h_source[3], eth->h_source[4], eth->h_source[5]);
-    printf("\t | -Destination Addresss %.2X - %.2X - %.2X - %.2X - %.2X - %.2X\n", eth->h_dest[0], eth->h_dest[1], eth->h_dest[2], eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
-    printf("\t | -Protocol: %x\n", eth->h_proto);
 
-
-    if(eth->h_proto == 46728 )
+    if (eth->h_proto == 46728)
     {
-      printf("New-IP packet detected!");
-      return 0;
+      printf("New-IP packet received!");
+
+      printf("\nEthernet Header\n");
+      printf("\t | -Source Address : %.2X - %.2X - %.2X - %.2X - %.2X - %.2X\n", eth->h_source[0], eth->h_source[1], eth->h_source[2], eth->h_source[3], eth->h_source[4], eth->h_source[5]);
+      printf("\t | -Destination Addresss %.2X - %.2X - %.2X - %.2X - %.2X - %.2X\n", eth->h_dest[0], eth->h_dest[1], eth->h_dest[2], eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
+      printf("\t | -Protocol: %x\n", eth->h_proto);
+
+      struct new_ip *new_iph = (struct new_ip *)(buffer + sizeof(struct ethhdr));
+      printf("%d\n",new_iph->a);
+    
     }
   }
 
