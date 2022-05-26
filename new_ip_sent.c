@@ -77,6 +77,7 @@ int main()
     eth->h_dest[5] = DESTMAC5;
 
     eth->h_proto = htons(0x88b6);
+    //printf("%d\n",eth->h_proto);
     total_len += sizeof(struct ethhdr);
 
     struct new_ip *new_iph = (struct new_ip *)(sendbuff + sizeof(struct ethhdr));
