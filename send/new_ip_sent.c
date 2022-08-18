@@ -51,13 +51,13 @@ int main()
     if ((ioctl(sock_raw, SIOCGIFHWADDR, &ifreq_c)) < 0) // getting MAC Address
         printf("error in SIOCGIFHWADDR ioctl reading");
 
-    struct ifreq ifreq_ip;
-    memset(&ifreq_ip, 0, sizeof(ifreq_ip));
-    strncpy(ifreq_ip.ifr_name, "enp0s3", IFNAMSIZ - 1);
-    if (ioctl(sock_raw, SIOCGIFADDR, &ifreq_ip) < 0) // getting IP Address
-    {
-        printf("error in SIOCGIFADDR\n");
-    }
+    // struct ifreq ifreq_ip;
+    // memset(&ifreq_ip, 0, sizeof(ifreq_ip));
+    // strncpy(ifreq_ip.ifr_name, "enp0s3", IFNAMSIZ - 1);
+    // if (ioctl(sock_raw, SIOCGIFADDR, &ifreq_ip) < 0) // getting IP Address
+    // {
+    //     printf("error in SIOCGIFADDR\n");
+    // }
 
     unsigned char *sendbuff = (unsigned char *)malloc(64); // increase in case of more data
     memset(sendbuff, 0, 64);
@@ -77,7 +77,7 @@ int main()
     eth->h_dest[5] = DESTMAC5;
 
     eth->h_proto = htons(0x88b6);
-    //printf("%d\n",eth->h_proto);
+    // printf("%d\n",eth->h_proto);
     total_len += sizeof(struct ethhdr);
 
     struct new_ip *new_iph = (struct new_ip *)(sendbuff + sizeof(struct ethhdr));
@@ -90,6 +90,27 @@ int main()
     sendbuff[total_len++] = 0xDD;
     sendbuff[total_len++] = 0xEE;
 
+    // struct sockaddr_ll sadr_ll;
+    // sadr_ll.sll_ifindex = ifreq_i.ifr_ifindex;
+    // sadr_ll.sll_halen = ETH_ALEN;
+    // sadr_ll.sll_addr[0] = DESTMAC0;
+    // sadr_ll.sll_addr[1] = DESTMAC1;
+    // sadr_ll.sll_addr[2] = DESTMAC2;
+    // sadr_ll.sll_addr[3] = DESTMAC3;
+    // sadr_ll.sll_addr[4] = DESTMAC4;
+    // sadr_ll.sll_addr[5] = DESTMAC5;
+
+    // send_len = sendto(sock_raw, sendbuff, 64, 0, (const struct sockaddr *)&sadr_ll, sizeof(struct sockaddr_ll));
+    // if (send_len < 0)
+    // {
+    //     printf("error in sending....sendlen = % d....errno = % d\n", send_len, errno);
+    //     return -1;
+    // }
+
+    struct iovec iov[1];
+    iov[0].iov_base = &sendbuff;
+    iov[0].iov_len = 64;
+
     struct sockaddr_ll sadr_ll;
     sadr_ll.sll_ifindex = ifreq_i.ifr_ifindex;
     sadr_ll.sll_halen = ETH_ALEN;
@@ -99,12 +120,19 @@ int main()
     sadr_ll.sll_addr[3] = DESTMAC3;
     sadr_ll.sll_addr[4] = DESTMAC4;
     sadr_ll.sll_addr[5] = DESTMAC5;
+    sadr_ll.sll_family = AF_PACKET;
 
-    send_len = sendto(sock_raw, sendbuff, 64, 0, (const struct sockaddr *)&sadr_ll, sizeof(struct sockaddr_ll));
-    if (send_len < 0)
+    struct msghdr message;
+    message.msg_name = &sadr_ll;
+    message.msg_namelen = sizeof(sadr_ll);
+    message.msg_iov = iov;
+    message.msg_iovlen = 1;
+    message.msg_control = 0;
+    message.msg_controllen = 0;
+
+    if (sendmsg(sock_raw, &message, 0) == -1)
     {
-        printf("error in sending....sendlen = % d....errno = % d\n", send_len, errno);
-        return -1;
+        printf("Error in sending the message!");
     }
 
     printf("Ends here!\n");
