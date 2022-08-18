@@ -38,7 +38,7 @@ int main()
 
     struct ifreq ifreq_i;
     memset(&ifreq_i, 0, sizeof(ifreq_i));
-    strncpy(ifreq_i.ifr_name, "enp0s3", IFNAMSIZ - 1);
+    strncpy(ifreq_i.ifr_name, "wlp2s0", IFNAMSIZ - 1);
     printf("%s\n", ifreq_i.ifr_name);
     if ((ioctl(sock_raw, SIOCGIFINDEX, &ifreq_i)) < 0) // getting the the Interface index
         printf("error in index ioctl reading");
@@ -47,13 +47,13 @@ int main()
 
     struct ifreq ifreq_c;
     memset(&ifreq_c, 0, sizeof(ifreq_c));
-    strncpy(ifreq_c.ifr_name, "enp0s3", IFNAMSIZ - 1);
+    strncpy(ifreq_c.ifr_name, "wlp2s0", IFNAMSIZ - 1);
     if ((ioctl(sock_raw, SIOCGIFHWADDR, &ifreq_c)) < 0) // getting MAC Address
         printf("error in SIOCGIFHWADDR ioctl reading");
 
     // struct ifreq ifreq_ip;
     // memset(&ifreq_ip, 0, sizeof(ifreq_ip));
-    // strncpy(ifreq_ip.ifr_name, "enp0s3", IFNAMSIZ - 1);
+    // strncpy(ifreq_ip.ifr_name, "wlp2s0", IFNAMSIZ - 1);
     // if (ioctl(sock_raw, SIOCGIFADDR, &ifreq_ip) < 0) // getting IP Address
     // {
     //     printf("error in SIOCGIFADDR\n");
@@ -108,11 +108,13 @@ int main()
     // }
 
 
-    char text[] = {"Test message. Test message. Test message!\n"};
-    size_t msg_len = strlen(text) + 1; 
+    struct new_ip ip;
+    ip.a = 12345;
+
+    size_t msg_len = sizeof(ip); 
 
     struct iovec iov[1];
-    iov[0].iov_base = text;
+    iov[0].iov_base = &ip;
     iov[0].iov_len = msg_len;
 
     struct sockaddr_ll sadr_ll;
