@@ -107,9 +107,13 @@ int main()
     //     return -1;
     // }
 
+
+    char text[] = {"Test message. Test message. Test message!\n"};
+    size_t msg_len = strlen(text) + 1; 
+
     struct iovec iov[1];
-    iov[0].iov_base = &sendbuff;
-    iov[0].iov_len = 64;
+    iov[0].iov_base = text;
+    iov[0].iov_len = msg_len;
 
     struct sockaddr_ll sadr_ll;
     sadr_ll.sll_ifindex = ifreq_i.ifr_ifindex;
@@ -130,10 +134,12 @@ int main()
     message.msg_control = 0;
     message.msg_controllen = 0;
 
-    if (sendmsg(sock_raw, &message, 0) == -1)
-    {
-        printf("Error in sending the message!");
-    }
+
+    printf("%ld\n",sendmsg(sock_raw, &message, 0));
+    // if (sendmsg(sock_raw, &message, 0) == -1)
+    // {
+    //     printf("Error in sending the message!");
+    // }
 
     printf("Ends here!\n");
 }

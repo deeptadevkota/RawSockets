@@ -9,7 +9,7 @@
 
 struct new_ip
 {
-    int a;
+  int a;
 };
 
 int main()
@@ -43,7 +43,9 @@ int main()
 
     struct ethhdr *eth = (struct ethhdr *)(buffer);
 
-    if (eth->h_proto == 46728)
+    // printf("%d\n", eth->h_proto);
+
+    if (eth->h_proto == 8238)
     {
       printf("New-IP packet received!");
 
@@ -54,7 +56,7 @@ int main()
 
       struct new_ip *new_iph = (struct new_ip *)(buffer + sizeof(struct ethhdr));
       printf("%d\n",new_iph->a);
-    
+
     }
   }
 
