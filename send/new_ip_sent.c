@@ -39,11 +39,8 @@ int main()
     struct ifreq ifreq_i;
     memset(&ifreq_i, 0, sizeof(ifreq_i));
     strncpy(ifreq_i.ifr_name, "enp0s3", IFNAMSIZ - 1);
-    printf("%s\n", ifreq_i.ifr_name);
     if ((ioctl(sock_raw, SIOCGIFINDEX, &ifreq_i)) < 0) // getting the the Interface index
         printf("error in index ioctl reading");
-    else
-        printf("index = %d\n", ifreq_i.ifr_ifindex);
 
     struct ifreq ifreq_c;
     memset(&ifreq_c, 0, sizeof(ifreq_c));
@@ -77,7 +74,6 @@ int main()
     eth->h_dest[5] = DESTMAC5;
 
     eth->h_proto = htons(0x88b6);
-    printf("%d\n",eth->h_proto);
     total_len += sizeof(struct ethhdr);
 
     struct new_ip *new_iph = (struct new_ip *)(sendbuff + sizeof(struct ethhdr));
@@ -91,17 +87,10 @@ int main()
     sendbuff[total_len++] = 0xEE;
 
 
-    char ip[] = {"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"};
-    // ip.a = 12345;
-    printf("%s\n",ip);
-
-    size_t msg_len = strlen(ip) + 1;
-
-    printf("size of buffer is: %ld\n",sizeof(sendbuff));
 
     struct iovec iov[1];
     iov[0].iov_base = sendbuff;
-    iov[0].iov_len = 64;
+    iov[0].iov_len = total_len;
 
     struct sockaddr_ll sadr_ll;
     sadr_ll.sll_ifindex = ifreq_i.ifr_ifindex;
