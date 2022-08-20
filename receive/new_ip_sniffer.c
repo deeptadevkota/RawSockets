@@ -35,7 +35,6 @@ int main()
   {
     // recvfrom is used to read data from a socket
     packet_size = recvfrom(sock, buffer, 65536, 0, NULL, NULL);
-    printf("%d\n\n", packet_size);
     if (packet_size == -1)
     {
       printf("Failed to get packets\n");
@@ -45,8 +44,7 @@ int main()
     struct ethhdr *eth = (struct ethhdr *)(buffer);
 
     // printf("%d\n", eth->h_proto);
-
-    if (eth->h_proto == 8238)
+    if (eth->h_proto == 46728)
     {
       printf("New-IP packet received!");
 
@@ -55,8 +53,8 @@ int main()
       printf("\t | -Destination Addresss %.2X - %.2X - %.2X - %.2X - %.2X - %.2X\n", eth->h_dest[0], eth->h_dest[1], eth->h_dest[2], eth->h_dest[3], eth->h_dest[4], eth->h_dest[5]);
       printf("\t | -Protocol: %x\n", eth->h_proto);
 
-      char *ip = (char *)buffer + sizeof(struct ethhdr) - 14;
-      printf("%s\n", ip);
+      struct new_ip *new_iph = (struct new_ip *)(buffer + sizeof(struct ethhdr));
+      printf("Data : %d\n", new_iph->a);
     }
   }
 
